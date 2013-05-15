@@ -3,12 +3,12 @@ define drupal::site (
 
   $domain                  = $name,
   $aliases                 = $drupal::params::aliases,
-  $home                    = $drupal::params::home,
+  $home_dir                = $drupal::params::home_dir,
   $build_dir               = $drupal::params::build_dir,
   $release_dir             = $drupal::params::release_dir,
   $use_make                = $drupal::params::use_make,
   $repo_name               = $drupal::params::repo_name,
-  $git_home                = $git::params::home,
+  $git_home                = $git::params::home_dir,
   $git_user                = $git::params::user,
   $git_group               = $git::params::group,
   $source                  = $drupal::params::source,
@@ -37,12 +37,12 @@ define drupal::site (
   #-----------------------------------------------------------------------------
 
   $build_dir_real = $build_dir ? {
-    ''      => $home,
+    ''      => $home_dir,
     default => $build_dir,
   }
 
   $repo_dir_real = $use_make ? {
-    'true'    => $git_home ? {
+    true    => $git_home ? {
       ''        => "${repo_name}.git",
       default   => "${git_home}/${repo_name}.git",
     },
@@ -73,7 +73,7 @@ define drupal::site (
   git::repo { $repo_name_real:
     user     => $git_user,
     group    => $git_group,
-    home     => $git_home,
+    home_dir => $git_home,
     source   => $source,
     revision => $revision,
     base     => false,
@@ -87,7 +87,7 @@ define drupal::site (
     $domain_release_dir = "$release_dir/$date_time_str"
 
     $working_copy       = $include_repos ? {
-      'true'             => '--working-copy',
+      true               => '--working-copy',
       default            => '',
     }
 
@@ -107,7 +107,7 @@ define drupal::site (
 
     exec { "link-release-${domain}":
       path        => [ '/bin', '/usr/bin' ],
-      command     => "rm -f '${home}'; ln -s '${domain_release_dir}' '${home}'",
+      command     => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
       refreshonly => true,
       subscribe   => Exec["copy-release-${domain}"],
       notify      => [ File["config-${domain}"], File["files-${domain}"] ],
@@ -118,8 +118,8 @@ define drupal::site (
   # Drupal settings
 
   file { "config-${domain}":
-    path      => "${home}/sites/${site_dir}/settings.php",
-    mode      => 0660,
+    path      => "${home_dir}/sites/${site_dir}/settings.php",
+    mode      => '0660',
     content   => template($settings_template),
   }
 
@@ -128,7 +128,7 @@ define drupal::site (
 
   if $files_dir {
     file { "files-${domain}":
-      path      => "${home}/sites/${site_dir}/files",
+      path      => "${home_dir}/sites/${site_dir}/files",
       ensure    => link,
       target    => $files_dir,
       force     => true,
@@ -136,9 +136,9 @@ define drupal::site (
   }
   else {
     file { "files-${domain}":
-      path      => "${home}/sites/${site_dir}/files",
+      path      => "${home_dir}/sites/${site_dir}/files",
       ensure    => directory,
-      mode      => 0770,
+      mode      => '0770',
     }
   }
 }

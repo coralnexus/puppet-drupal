@@ -11,7 +11,7 @@ class drupal::params inherits drupal::default {
 
   #---
 
-  $home                    = module_param('home')
+  $home_dir                = module_param('home_dir')
   $build_dir               = module_param('build_dir')
   $release_dir             = module_param('release_dir')
 

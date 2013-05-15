@@ -7,12 +7,12 @@ class drupal::default {
 
   $aliases                 = ''
 
-  $use_make                = 'true'
+  $use_make                = true
   $repo_name               = 'panopoly'
   $source                  = 'git://git.drupal.org/project/panopoly.git'
   $revision                = '7.x-1.x'
   $make_file               = 'build-panopoly.make'
-  $include_repos           = 'false'
+  $include_repos           = false
 
   $server_user             = 'root'
   $server_group            = 'root'

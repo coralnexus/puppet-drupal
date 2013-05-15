@@ -52,7 +52,7 @@ class drupal (
   file { 'drupal-releases':
     path    => $release_dir,
     ensure  => directory,
-    mode    => 0775,
+    mode    => '0775',
     require => Package['drush'],
   }
 }
