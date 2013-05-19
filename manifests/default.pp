@@ -40,9 +40,9 @@ class drupal::default {
 
   case $::operatingsystem {
     debian, ubuntu: {
-      $home              = '/var/www'
+      $home_dir          = '/var/www'
       $build_dir         = ''
-      $release_dir       = "${home}/releases"
+      $release_dir       = "${home_dir}/releases"
 
       $settings_template = 'drupal/settings.php.erb'
     }

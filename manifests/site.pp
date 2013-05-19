@@ -36,47 +36,29 @@ define drupal::site (
 
   #-----------------------------------------------------------------------------
 
-  $build_dir_real = $build_dir ? {
-    ''      => $home_dir,
-    default => $build_dir,
-  }
-
-  $repo_dir_real = $use_make ? {
-    true    => $git_home ? {
-      ''        => "${repo_name}.git",
-      default   => "${git_home}/${repo_name}.git",
-    },
-    default => $build_dir_real,
-  }
-
-  $repo_name_real = $git_home ? {
-    ''      => $repo_dir_real,
-    default => "${repo_name}.git",
-  }
+  $definition_name = name("drupal_site_${name}")
 
   #---
 
-  File {
-    owner => $server_user,
-    group => $server_group,
-  }
+  $build_dir_real = ensure($build_dir, $build_dir, $home_dir)
+  $repo_dir_real  = ensure($use_make,
+    ensure($git_home, "${git_home}/${repo_name}.git", "${repo_name}.git"),
+    $build_dir_real
+  )
+  $repo_name_real = ensure($git_home and $use_make, "${repo_name}.git", $repo_dir_real)
 
   #-----------------------------------------------------------------------------
   # Drupal repository (pre processing)
 
-  if $use_make {
-    #Git::Repo {
-    #  notify => Exec["make-release-${domain}"],
-    #}
-  }
-
-  git::repo { $repo_name_real:
-    user     => $git_user,
-    group    => $git_group,
-    home_dir => $git_home,
-    source   => $source,
-    revision => $revision,
-    base     => false,
+  git::repo { $definition_name:
+    path          => $repo_name_real,
+    user          => ensure($use_make, $git_user, $server_user),
+    group         => ensure($use_make, $git_group, $server_group),
+    home_dir      => ensure($git_home and $use_make, $git_home, ''),
+    source        => $source,
+    revision      => $revision,
+    base          => false,
+    update_notify => ensure($use_make, Exec["${definition_name}_make"])
   }
 
   if $use_make {
@@ -84,61 +66,69 @@ define drupal::site (
     # Distribution releases with drush make
 
     $date_time_str      = strftime("%F-%R")
-    $domain_release_dir = "$release_dir/$date_time_str"
+    $working_copy       = ensure($include_repos, '--working-copy', '')
 
-    $working_copy       = $include_repos ? {
-      true               => '--working-copy',
-      default            => '',
-    }
+    $domain_release_dir = "${release_dir}/${date_time_str}"
+    $profile_dir        = "${domain_release_dir}/profiles/${repo_name}"
 
-    exec { "make-release-${domain}":
-      path        => [ '/bin', '/usr/bin' ],
-      command     => "drush make ${working_copy} '${repo_dir_real}/${make_file}' '${domain_release_dir}'",
-      creates     => $domain_release_dir,
-      require     => [ File['drupal-releases'], Git::Repo[$repo_name_real] ],
-    }
+    #---
 
-    exec { "copy-release-${domain}":
-      path        => [ '/bin', '/usr/bin' ],
-      command     => "cp -Rf '${repo_dir_real}' '${domain_release_dir}/profiles/${repo_name}'",
-      refreshonly => true,
-      subscribe   => Exec["make-release-${domain}"],
-    }
-
-    exec { "link-release-${domain}":
-      path        => [ '/bin', '/usr/bin' ],
-      command     => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
-      refreshonly => true,
-      subscribe   => Exec["copy-release-${domain}"],
-      notify      => [ File["config-${domain}"], File["files-${domain}"] ],
+    coral::exec { $definition_name:
+      resources => {
+        make => {
+          command => "drush make ${working_copy} '${repo_dir_real}/${make_file}' '${domain_release_dir}'",
+          creates => $domain_release_dir
+        },
+        copy => {
+          command   => "cp -Rf '${repo_dir_real}' '${profile_dir}'",
+          creates   => $profile_dir,
+          subscribe => 'make',
+          notify    => Coral::File[$definition_name]
+        },
+        release => {
+          command   => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
+          subscribe => Coral::File[$definition_name]
+        }
+      },
+      defaults => {
+        refreshonly => true
+      },
+      require => [ File['drupal-releases'], Git::Repo[$definition_name] ]
     }
   }
 
   #-----------------------------------------------------------------------------
-  # Drupal settings
+  # Configuration
 
-  file { "config-${domain}":
-    path      => "${home_dir}/sites/${site_dir}/settings.php",
-    mode      => '0660',
-    content   => template($settings_template),
+  coral::file { $definition_name:
+    resources => {
+      config => {
+        path    => "${home_dir}/sites/${site_dir}/settings.php",
+        mode    => '0660',
+        content => template($settings_template),
+      },
+      files => {
+        path   => "${home_dir}/sites/${site_dir}/files",
+        ensure => ensure($files_dir, 'link', 'directory'),
+        target => ensure($files_dir),
+        force  => ensure($files_dir, true),
+        mode   => '0770'
+      }
+    },
+    defaults => {
+      owner => $server_user,
+      group => $server_group
+    },
+    require => Git::Repo[$definition_name]
   }
 
   #-----------------------------------------------------------------------------
-  # Drupal files
+  # Actions
 
-  if $files_dir {
-    file { "files-${domain}":
-      path      => "${home_dir}/sites/${site_dir}/files",
-      ensure    => link,
-      target    => $files_dir,
-      force     => true,
-    }
-  }
-  else {
-    file { "files-${domain}":
-      path      => "${home_dir}/sites/${site_dir}/files",
-      ensure    => directory,
-      mode      => '0770',
-    }
-  }
+  coral::exec { "${definition_name}_extra": }
+
+  #-----------------------------------------------------------------------------
+  # Cron
+
+  coral::cron { $definition_name: }
 }
