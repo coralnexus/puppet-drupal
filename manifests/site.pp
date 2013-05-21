@@ -52,8 +52,8 @@ define drupal::site (
 
   git::repo { $definition_name:
     path          => $repo_name_real,
-    user          => ensure($use_make, $git_user, $server_user),
-    group         => ensure($use_make, $git_group, $server_group),
+    user          => $git_user,
+    group         => $server_group,
     home_dir      => ensure($git_home and $use_make, $git_home, ''),
     source        => $source,
     revision      => $revision,
