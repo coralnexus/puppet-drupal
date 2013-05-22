@@ -7,6 +7,7 @@ define drupal::site (
   $build_dir               = $drupal::params::build_dir,
   $release_dir             = $drupal::params::release_dir,
   $use_make                = $drupal::params::use_make,
+  $file_mode               = $drupal::params::file_mode,
   $repo_name               = $drupal::params::repo_name,
   $git_home                = $git::params::home_dir,
   $git_user                = $git::params::user,
@@ -51,14 +52,15 @@ define drupal::site (
   # Drupal repository (pre processing)
 
   git::repo { $definition_name:
-    path          => $repo_name_real,
-    user          => $git_user,
-    group         => $server_group,
-    home_dir      => ensure($git_home and $use_make, $git_home, ''),
-    source        => $source,
-    revision      => $revision,
-    base          => false,
-    update_notify => ensure($use_make, Exec["${definition_name}_make"])
+    path              => $repo_name_real,
+    user              => $git_user,
+    group             => $server_group,
+    home_dir          => ensure($git_home and $use_make, $git_home, ''),
+    source            => $source,
+    revision          => $revision,
+    base              => false,
+    monitor_file_mode => false,
+    update_notify     => ensure($use_make, Exec["${definition_name}_make"])
   }
 
   if $use_make {
@@ -83,7 +85,7 @@ define drupal::site (
           command   => "cp -Rf '${repo_dir_real}' '${profile_dir}'",
           creates   => $profile_dir,
           subscribe => 'make',
-          notify    => Coral::File[$definition_name]
+          notify    => Coral::Exec["${definition_name}_source"]
         },
         release => {
           command   => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
@@ -99,6 +101,18 @@ define drupal::site (
 
   #-----------------------------------------------------------------------------
   # Configuration
+  
+  coral::exec { "${definition_name}_source":
+    resources => {
+      mode => {
+        command => "find ${home_dir} -type f -exec chmod ${file_mode} {} \\;"
+      }
+    },
+    options => { debug => true },
+    require => Git::Repo[$definition_name]
+  }
+  
+  #---
 
   coral::file { $definition_name:
     resources => {
@@ -116,10 +130,10 @@ define drupal::site (
       }
     },
     defaults => {
-      owner => $server_user,
+      owner => $git_user,
       group => $server_group
-    },
-    require => Git::Repo[$definition_name]
+    },    
+    require => Coral::Exec["${definition_name}_source"]
   }
 
   #-----------------------------------------------------------------------------
