@@ -203,26 +203,28 @@
 <% if databases.is_a? Hash -%>
 <% databases.each do |db_name, info| -%>
 $databases['<%= db_name -%>']['default'] = array(
-  'driver'    => '<%= info['driver'] ? info['driver'] : 'mysql' -%>',
-  'database'  => '<%= info['database'] ? info['database'] : db_name -%>',
-  'username'  => '<%= info['username'] ? info['username'] : db_name -%>',
-  'password'  => '<%= info['password'] -%>',
-  'host'      => '<%= info['host'] ? info['host'] : 'localhost' -%>',
-  'port'      => '<%= info['port'] ? info['port'] : '3306' -%>',
-  'prefix'    => '<%= info['prefix'] -%>',
-  'collation' => '<%= info['collation'] ? info['collation'] : 'utf8_general_ci' -%>',
+  'driver'       => '<%= info['driver'] ? info['driver'] : 'mysql' -%>',
+  'database'     => '<%= info['database'] ? info['database'] : db_name -%>',
+  'username'     => '<%= info['username'] ? info['username'] : db_name -%>',
+  'password'     => '<%= info['password'] -%>',
+  'host'         => '<%= info['host'] ? info['host'] : 'localhost' -%>',
+  'port'         => '<%= info['port'] ? info['port'] : '3306' -%>',
+  'prefix'       => '<%= info['prefix'] -%>',
+  'collation'    => '<%= info['collation'] ? info['collation'] : 'utf8_general_ci' -%>',
+  'transactions' => <%= info['transactions'] ? info['transactions'] : 'TRUE' -%>,
 );
 <% if info['slaves'].is_a? Hash -%>
 <% info['slaves'].each do |slave_name, slave| -%>
 $databases['<%= db_name -%>']['slave'][] = array(
-  'driver'    => '<%= info['driver'] ? info['driver'] : 'mysql' -%>',
-  'database'  => '<%= slave['database'] ? slave['database'] : slave_name -%>',
-  'username'  => '<%= slave['username'] ? slave['username'] : slave_name -%>',
-  'password'  => '<%= slave['password'] -%>',
-  'host'      => '<%= slave['host'] -%>',
-  'port'      => '<%= slave['port'] ? slave['port'] : '3306' -%>',
-  'prefix'    => '<%= slave['prefix'] -%>',
-  'collation' => '<%= info['collation'] ? info['collation'] : 'utf8_general_ci' -%>',
+  'driver'       => '<%= info['driver'] ? info['driver'] : 'mysql' -%>',
+  'database'     => '<%= slave['database'] ? slave['database'] : slave_name -%>',
+  'username'     => '<%= slave['username'] ? slave['username'] : slave_name -%>',
+  'password'     => '<%= slave['password'] -%>',
+  'host'         => '<%= slave['host'] -%>',
+  'port'         => '<%= slave['port'] ? slave['port'] : '3306' -%>',
+  'prefix'       => '<%= slave['prefix'] -%>',
+  'collation'    => '<%= info['collation'] ? info['collation'] : 'utf8_general_ci' -%>',
+  'transactions' => <%= info['transactions'] ? info['transactions'] : 'TRUE' -%>,
 );
 <% end -%>
 <% end -%>
