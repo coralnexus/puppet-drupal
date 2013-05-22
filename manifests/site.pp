@@ -108,7 +108,6 @@ define drupal::site (
         command => "find ${home_dir} -type f -exec chmod ${file_mode} {} \\;"
       }
     },
-    options => { debug => true },
     require => Git::Repo[$definition_name]
   }
   
