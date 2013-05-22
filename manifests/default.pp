@@ -25,7 +25,8 @@ class drupal::default {
   $files_dir               = ''
   $databases               = ''
   
-  $file_mode               = '0666'
+  $dir_mode                = '0770'
+  $file_mode               = '0660'
 
   $base_url                = ''
   $cookie_domain           = ''

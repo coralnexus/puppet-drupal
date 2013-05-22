@@ -39,6 +39,7 @@ class drupal::params inherits drupal::default {
   $files_dir               = module_param('files_dir')
   $databases               = module_hash('databases')
   
+  $dir_mode                = module_param('dir_mode')
   $file_mode               = module_param('file_mode')
 
   $base_url                = module_param('base_url')

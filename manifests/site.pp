@@ -7,6 +7,7 @@ define drupal::site (
   $build_dir               = $drupal::params::build_dir,
   $release_dir             = $drupal::params::release_dir,
   $use_make                = $drupal::params::use_make,
+  $dir_mode                = $drupal::params::dir_mode,
   $file_mode               = $drupal::params::file_mode,
   $repo_name               = $drupal::params::repo_name,
   $git_home                = $git::params::home_dir,
@@ -104,7 +105,10 @@ define drupal::site (
   
   coral::exec { "${definition_name}_source":
     resources => {
-      mode => {
+      dir_mode => {
+        command => "find ${home_dir} -type d -exec chmod ${dir_mode} {} \\;"
+      },
+      file_mode => {
         command => "find ${home_dir} -type f -exec chmod ${file_mode} {} \\;"
       }
     },
@@ -125,7 +129,7 @@ define drupal::site (
         ensure => ensure($files_dir, 'link', 'directory'),
         target => ensure($files_dir),
         force  => ensure($files_dir, true),
-        mode   => '0770'
+        mode   => $file_mode
       }
     },
     defaults => {
