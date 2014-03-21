@@ -76,7 +76,7 @@ define drupal::site (
 
     #---
 
-    coral::exec { $definition_name:
+    corl::exec { $definition_name:
       resources => {
         make => {
           command => "drush make ${working_copy} '${repo_dir_real}/${make_file}' '${domain_release_dir}'",
@@ -86,11 +86,11 @@ define drupal::site (
           command   => "cp -Rf '${repo_dir_real}' '${profile_dir}'",
           creates   => $profile_dir,
           subscribe => 'make',
-          notify    => Coral::Exec["${definition_name}_source"]
+          notify    => Corl::Exec["${definition_name}_source"]
         },
         release => {
           command   => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
-          subscribe => Coral::File[$definition_name]
+          subscribe => Corl::File[$definition_name]
         }
       },
       defaults => {
@@ -103,7 +103,7 @@ define drupal::site (
   #-----------------------------------------------------------------------------
   # Configuration
   
-  coral::exec { "${definition_name}_source":
+  corl::exec { "${definition_name}_source":
     resources => {
       dir_mode => {
         command => "find ${home_dir} -type d -exec chmod ${dir_mode} {} \\;"
@@ -117,7 +117,7 @@ define drupal::site (
   
   #---
 
-  coral::file { $definition_name:
+  corl::file { $definition_name:
     resources => {
       config => {
         path    => "${home_dir}/sites/${site_dir}/settings.php",
@@ -136,16 +136,16 @@ define drupal::site (
       owner => $git_user,
       group => $server_group
     },    
-    require => Coral::Exec["${definition_name}_source"]
+    require => Corl::Exec["${definition_name}_source"]
   }
 
   #-----------------------------------------------------------------------------
   # Actions
 
-  coral::exec { "${definition_name}_extra": }
+  corl::exec { "${definition_name}_extra": }
 
   #-----------------------------------------------------------------------------
   # Cron
 
-  coral::cron { $definition_name: }
+  corl::cron { $definition_name: }
 }
