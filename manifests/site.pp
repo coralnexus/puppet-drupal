@@ -136,7 +136,7 @@ define drupal::site (
       owner => $git_user,
       group => $server_group
     },    
-    require => Corl::Exec["${definition_name}_source"]
+    require => Git::Repo[$definition_name] #Corl::Exec["${definition_name}_source"]
   }
 
   #-----------------------------------------------------------------------------
