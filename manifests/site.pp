@@ -103,17 +103,17 @@ define drupal::site (
   #-----------------------------------------------------------------------------
   # Configuration
   
-  corl::exec { "${definition_name}_source":
-    resources => {
-      dir_mode => {
-        command => "find ${home_dir} -type d -exec chmod ${dir_mode} {} \\;"
-      },
-      file_mode => {
-        command => "find ${home_dir} -type f -exec chmod ${file_mode} {} \\;"
-      }
-    },
-    require => Git::Repo[$definition_name]
-  }
+  #corl::exec { "${definition_name}_source":
+  #  resources => {
+  #    dir_mode => {
+  #      command => "find ${home_dir} -type d -exec chmod ${dir_mode} {} \\;"
+  #    },
+  #    file_mode => {
+  #      command => "find ${home_dir} -type f -exec chmod ${file_mode} {} \\;"
+  #    }
+  #  },
+  #  require => Git::Repo[$definition_name]
+  #}
   
   #---
 
