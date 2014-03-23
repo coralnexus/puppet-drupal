@@ -201,7 +201,7 @@
  * @endcode
  */
 <% if @databases.is_a? Hash -%>
-<% @databases.each do |db_name, info| -%>
+<% CORL::Util::Data.string_map(@databases).each do |db_name, info| -%>
 $databases['<%= db_name -%>']['default'] = array(
   'driver'       => '<%= info['driver'] ? info['driver'] : 'mysql' -%>',
   'database'     => '<%= info['database'] ? info['database'] : db_name -%>',
