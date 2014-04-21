@@ -1,4 +1,3 @@
-
 define drupal::site (
 
   $domain                  = $name,
@@ -117,20 +116,27 @@ define drupal::site (
   #}
   
   #---
+  
+  $drupal_default_dir = "${home_dir}/sites/${site_dir}"
 
   corl::file { $definition_name:
     resources => {
+      config_dir => {
+        path    => $drupal_default_dir,
+        ensure  => directory
+      },
       config => {
-        path    => "${home_dir}/sites/${site_dir}/settings.php",
-        mode    => '0660',
+        path    => "${drupal_default_dir}/settings.php",
+        mode    => '0600',
         content => template($settings_template),
+        require => 'config_dir'
       },
       files => {
-        path   => "${home_dir}/sites/${site_dir}/files",
+        path   => "${drupal_default_dir}/files",
         ensure => ensure($files_dir, 'link', 'directory'),
         target => ensure($files_dir),
         force  => ensure($files_dir, true),
-        mode   => $file_mode
+        mode   => $dir_mode
       }
     },
     defaults => {
