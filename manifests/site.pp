@@ -124,7 +124,7 @@ define drupal::site (
       config_dir => {
         path   => $drupal_default_dir,
         ensure => directory,
-        mode   => '0700'
+        mode   => '0770'
       },
       config => {
         path    => "${drupal_default_dir}/settings.php",
