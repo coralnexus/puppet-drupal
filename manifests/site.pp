@@ -122,8 +122,9 @@ define drupal::site (
   corl::file { $definition_name:
     resources => {
       config_dir => {
-        path    => $drupal_default_dir,
-        ensure  => directory
+        path   => $drupal_default_dir,
+        ensure => directory,
+        mode   => '0700'
       },
       config => {
         path    => "${drupal_default_dir}/settings.php",
