@@ -102,21 +102,7 @@ define drupal::site (
 
   #-----------------------------------------------------------------------------
   # Configuration
-  
-  #corl::exec { "${definition_name}_source":
-  #  resources => {
-  #    dir_mode => {
-  #      command => "find ${home_dir} -type d -exec chmod ${dir_mode} {} \\;"
-  #    },
-  #    file_mode => {
-  #      command => "find ${home_dir} -type f -exec chmod ${file_mode} {} \\;"
-  #    }
-  #  },
-  #  require => Git::Repo[$definition_name]
-  #}
-  
-  #---
-  
+
   $drupal_default_dir = "${home_dir}/sites/${site_dir}"
 
   corl::file { $definition_name:
@@ -143,14 +129,14 @@ define drupal::site (
     defaults => {
       owner => $git_user,
       group => $server_group
-    },    
-    require => Git::Repo[$definition_name] #Corl::Exec["${definition_name}_source"]
+    },
+    require => Git::Repo[$definition_name]
   }
 
   #-----------------------------------------------------------------------------
   # Actions
 
-  corl::exec { "${definition_name}_extra": }
+  corl::exec { "${definition_name}_extra": require => Package['drush'] }
 
   #-----------------------------------------------------------------------------
   # Cron
