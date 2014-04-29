@@ -136,7 +136,7 @@ define drupal::site (
   #-----------------------------------------------------------------------------
   # Actions
 
-  corl::exec { "${definition_name}_extra": require => Package['drush'] }
+  corl::exec { "${definition_name}_extra": }
 
   #-----------------------------------------------------------------------------
   # Cron
