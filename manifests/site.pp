@@ -7,16 +7,13 @@ define drupal::site (
   $release_dir             = $drupal::params::release_dir,
   $use_make                = $drupal::params::use_make,
   $dir_mode                = $drupal::params::dir_mode,
-  $file_mode               = $drupal::params::file_mode,
   $repo_name               = $drupal::params::repo_name,
   $git_home                = $git::params::home_dir,
   $git_user                = $git::params::user,
-  $git_group               = $git::params::group,
   $source                  = $drupal::params::source,
   $revision                = $drupal::params::revision,
   $make_file               = $drupal::params::make_file,
   $include_repos           = $drupal::params::include_repos,
-  $server_user             = $drupal::params::server_user,
   $server_group            = $drupal::params::server_group,
   $site_dir                = $drupal::params::site_dir,
   $settings_template       = $drupal::params::settings_template,
@@ -109,8 +106,7 @@ define drupal::site (
     resources => {
       config_dir => {
         path   => $drupal_default_dir,
-        ensure => directory,
-        mode   => '0770'
+        ensure => directory
       },
       config => {
         path    => "${drupal_default_dir}/settings.php",
