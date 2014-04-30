@@ -16,6 +16,7 @@ define drupal::site (
   $include_repos           = $drupal::params::include_repos,
   $server_group            = $drupal::params::server_group,
   $site_dir                = $drupal::params::site_dir,
+  $site_dir_mode           = $drupal::params::site_dir_mode,
   $settings_template       = $drupal::params::settings_template,
   $site_ip                 = $drupal::params::site_ip,
   $admin_email             = $drupal::params::admin_email,
@@ -106,7 +107,8 @@ define drupal::site (
     resources => {
       config_dir => {
         path   => $drupal_default_dir,
-        ensure => directory
+        ensure => directory,
+        mode   => $site_dir_mode
       },
       config => {
         path    => "${drupal_default_dir}/settings.php",

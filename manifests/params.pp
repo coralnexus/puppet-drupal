@@ -40,6 +40,7 @@ class drupal::params inherits drupal::default {
   $databases               = module_hash('databases')
 
   $dir_mode                = module_param('dir_mode')
+  $site_dir_mode           = module_param('site_dir_mode')
 
   $base_url                = module_param('base_url')
   $cookie_domain           = module_param('cookie_domain')

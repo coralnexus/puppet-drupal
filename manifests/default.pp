@@ -26,6 +26,7 @@ class drupal::default {
   $databases               = ''
 
   $dir_mode                = '0770'
+  $site_dir_mode           = '0700'
 
   $base_url                = ''
   $cookie_domain           = ''
