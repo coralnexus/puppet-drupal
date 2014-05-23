@@ -59,9 +59,10 @@ class drupal inherits drupal::params {
   corl::exec { $base_name:
     resources => {
       drush_init => {
-        command   => 'drush help',
-        user      => $drupal::params::drush_root,
-        subscribe => Package["${base_name}_drush"]
+        command     => 'drush help',
+        user        => $drupal::params::drush_root,
+        refreshonly => true,
+        subscribe   => Package["${base_name}_drush"]
       }
     }
   }
