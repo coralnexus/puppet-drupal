@@ -92,7 +92,7 @@ define drupal::site (
         },
         release => {
           command   => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
-          subscribe => Corl::File[$definition_name]
+          subscribe => File["${definition_name}_config"]
         }
       },
       defaults => {

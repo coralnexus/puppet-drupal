@@ -21,37 +21,48 @@
 #
 # Sample Usage:
 #
-#  class { 'drupal':
+#  include drupal
 #
-#  }
-#
-# [Remember: No empty lines between comments and class definition]
-class drupal (
+class drupal inherits drupal::params {
 
-  $drush_package  = $drupal::params::drush_package,
-  $drush_ensure   = $drupal::params::drush_ensure,
-  $drush_source   = $drupal::params::drush_source,
-  $release_dir    = $drupal::params::release_dir,
-  $release_mode   = $drupal::params::release_mode
-
-) inherits drupal::params {
+  $base_name = $drupal::params::base_name
 
   #-----------------------------------------------------------------------------
   # Drupal installation
 
-  package { 'drush':
-    name     => $drush_package,
-    ensure   => $drush_ensure,
-    provider => 'pear',
-    source   => $drush_source
+  corl::package { $base_name:
+    resources => {
+      drush => {
+        name     => $drupal::params::drush_package,
+        ensure   => $drupal::params::drush_ensure,
+        provider => pear,
+        source   => $drupal::params::drush_source
+      }
+    }
   }
 
   #-----------------------------------------------------------------------------
   # Drupal setup
 
-  file { 'drupal-releases':
-    path    => $release_dir,
-    ensure  => directory,
-    mode    => $release_mode
+  corl::file { $base_name:
+    resources => {
+      drupal-releases => {
+        path    => $drupal::params::release_dir,
+        ensure  => directory,
+        mode    => $drupal::params::release_mode
+      }
+    }
+  }
+
+  #---
+
+  corl::exec { $base_name:
+    resources => {
+      drush_init => {
+        command   => 'drush help',
+        user      => $drupal::params::drush_root,
+        subscribe => Package["${base_name}_drush"]
+      }
+    }
   }
 }
