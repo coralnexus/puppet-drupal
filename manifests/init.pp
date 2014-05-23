@@ -32,6 +32,7 @@ class drupal (
   $drush_ensure   = $drupal::params::drush_ensure,
   $drush_source   = $drupal::params::drush_source,
   $release_dir    = $drupal::params::release_dir,
+  $release_mode   = $drupal::params::release_mode
 
 ) inherits drupal::params {
 
@@ -51,6 +52,6 @@ class drupal (
   file { 'drupal-releases':
     path    => $release_dir,
     ensure  => directory,
-    mode    => '0775'
+    mode    => $release_mode
   }
 }

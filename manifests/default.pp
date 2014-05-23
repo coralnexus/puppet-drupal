@@ -25,6 +25,7 @@ class drupal::default {
   $files_dir               = ''
   $databases               = ''
 
+  $release_mode            = '0775'
   $dir_mode                = '0770'
   $site_dir_mode           = '0700'
 
