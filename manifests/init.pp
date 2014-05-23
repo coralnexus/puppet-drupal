@@ -42,8 +42,7 @@ class drupal (
     name     => $drush_package,
     ensure   => $drush_ensure,
     provider => 'pear',
-    source   => $drush_source,
-    require  => Class['php'],
+    source   => $drush_source
   }
 
   #-----------------------------------------------------------------------------
@@ -52,7 +51,6 @@ class drupal (
   file { 'drupal-releases':
     path    => $release_dir,
     ensure  => directory,
-    mode    => '0775',
-    require => Package['drush'],
+    mode    => '0775'
   }
 }

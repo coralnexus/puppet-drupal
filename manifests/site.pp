@@ -35,6 +35,10 @@ define drupal::site (
 
   #-----------------------------------------------------------------------------
 
+  include drupal
+
+  #---
+
   $definition_name = name("drupal_site_${name}")
 
   #---
@@ -59,6 +63,7 @@ define drupal::site (
     revision          => $revision,
     base              => false,
     monitor_file_mode => false,
+    require           => Class['drupal'],
     update_notify     => ensure($use_make, Exec["${definition_name}_make"])
   }
 
@@ -83,8 +88,7 @@ define drupal::site (
         copy => {
           command   => "cp -Rf '${repo_dir_real}' '${profile_dir}'",
           creates   => $profile_dir,
-          subscribe => 'make',
-          notify    => Corl::Exec["${definition_name}_source"]
+          subscribe => 'make'
         },
         release => {
           command   => "rm -f '${home_dir}'; ln -s '${domain_release_dir}' '${home_dir}'",
@@ -94,7 +98,7 @@ define drupal::site (
       defaults => {
         refreshonly => true
       },
-      require => [ File['drupal-releases'], Git::Repo[$definition_name] ]
+      require => Git::Repo[$definition_name]
     }
   }
 
@@ -134,10 +138,10 @@ define drupal::site (
   #-----------------------------------------------------------------------------
   # Actions
 
-  corl::exec { "${definition_name}_extra": }
+  corl::exec { "${definition_name}_extra": require => Git::Repo[$definition_name] }
 
   #-----------------------------------------------------------------------------
   # Cron
 
-  corl::cron { $definition_name: }
+  corl::cron { $definition_name: require => Git::Repo[$definition_name] }
 }
