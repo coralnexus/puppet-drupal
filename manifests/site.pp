@@ -138,10 +138,14 @@ define drupal::site (
   #-----------------------------------------------------------------------------
   # Actions
 
-  corl::exec { "${definition_name}_extra": require => Git::Repo[$definition_name] }
+  corl::exec { "${definition_name}_extra":
+    require => [ Git::Repo[$definition_name], Corl::File[$definition_name] ]
+  }
 
   #-----------------------------------------------------------------------------
   # Cron
 
-  corl::cron { $definition_name: require => Git::Repo[$definition_name] }
+  corl::cron { $definition_name:
+    require => Corl::Exec["${definition_name}_extra"]
+  }
 }
