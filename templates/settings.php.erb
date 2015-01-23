@@ -557,6 +557,14 @@ $conf['404_fast_html'] = '<html xmlns="http://www.w3.org/1999/xhtml"><head><titl
 # $conf['allow_authorize_operations'] = FALSE;
 
 /**
+ * SSL termination settings
+ */
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
+  $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+  $_SERVER['HTTPS'] = 'on';
+}
+
+/**
  * Custom Drupal configurations:
  */
 <% if @conf.is_a? Hash -%>
@@ -564,17 +572,17 @@ $conf['404_fast_html'] = '<html xmlns="http://www.w3.org/1999/xhtml"><head><titl
 <% if data.is_a? Array -%>
 $conf['<%= name -%>'] = array(
 <% data.each do |value| -%>
-  <%= value -%>,      
+  <%= value -%>,
 <% end -%>
 );
 <% elsif data.is_a? Hash -%>
 $conf['<%= name -%>'] = array(
 <% data.each do |key, value| -%>
-  '<%= key -%>' => <%= value -%>,      
+  '<%= key -%>' => <%= value -%>,
 <% end -%>
-);    
+);
 <% else -%>
-$conf['<%= name -%>'] = <%= data -%>;  
-<% end -%>  
+$conf['<%= name -%>'] = <%= data -%>;
+<% end -%>
 <% end %>
 <% end -%>
