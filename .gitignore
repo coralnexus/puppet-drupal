@@ -1,3 +1,6 @@
 # Puppet module files.
 metadata.json
 pkg/
+
+# Nucleon related
+.nucleon
