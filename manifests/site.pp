@@ -30,7 +30,7 @@ define drupal::site (
   $pcre_backtrack_limit    = $drupal::params::pcre_backtrack_limit,
   $pcre_recursion_limit    = $drupal::params::pcre_recursion_limit,
   $ini_settings            = $drupal::params::ini_settings,
-  $conf                    = $drupal::params::conf,
+  $conf                    = $drupal::params::conf
 
 ) {
 
@@ -101,7 +101,7 @@ define drupal::site (
       defaults => {
         refreshonly => true
       },
-      require => Git::Repo[$definition_name]
+      require => ensure($manage_site_repo, Git::Repo[$definition_name])
     }
   }
 
@@ -135,14 +135,14 @@ define drupal::site (
       owner => $git_user,
       group => $server_group
     },
-    require => Git::Repo[$definition_name]
+    require => ensure($manage_site_repo, Git::Repo[$definition_name])
   }
 
   #-----------------------------------------------------------------------------
   # Actions
 
   corl::exec { "${definition_name}_extra":
-    require => [ Git::Repo[$definition_name], Corl::File[$definition_name] ]
+    require => Corl::File[$definition_name]
   }
 
   #-----------------------------------------------------------------------------
