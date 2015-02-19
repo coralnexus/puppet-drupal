@@ -28,6 +28,7 @@ class drupal::params inherits drupal::default {
 
   $aliases                 = module_param('aliases', '')
 
+  $manage_site_repo        = module_param('manage_site_repo', true)
   $use_make                = module_param('use_make', true)
   $repo_name               = module_param('repo_name', 'panopoly')
   $source                  = module_param('source', 'git://git.drupal.org/project/panopoly.git')

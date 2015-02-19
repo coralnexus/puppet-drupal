@@ -2,6 +2,7 @@ define drupal::site (
 
   $domain                  = $name,
   $aliases                 = $drupal::params::aliases,
+  $manage_site_repo        = $drupal::params::manage_site_repo,
   $home_dir                = $drupal::params::home_dir,
   $build_dir               = $drupal::params::build_dir,
   $release_dir             = $drupal::params::release_dir,
@@ -53,18 +54,20 @@ define drupal::site (
   #-----------------------------------------------------------------------------
   # Drupal repository (pre processing)
 
-  git::repo { $definition_name:
-    path              => $repo_name_real,
-    user              => $git_user,
-    owner             => $git_user,
-    group             => $server_group,
-    home_dir          => ensure($git_home and $use_make, $git_home, ''),
-    source            => $source,
-    revision          => $revision,
-    base              => false,
-    monitor_file_mode => false,
-    require           => Class['drupal'],
-    update_notify     => ensure($use_make, Exec["${definition_name}_make"])
+  if $manage_site_repo {
+    git::repo { $definition_name:
+      path              => $repo_name_real,
+      user              => $git_user,
+      owner             => $git_user,
+      group             => $server_group,
+      home_dir          => ensure($git_home and $use_make, $git_home, ''),
+      source            => $source,
+      revision          => $revision,
+      base              => false,
+      monitor_file_mode => false,
+      require           => Class['drupal'],
+      update_notify     => ensure($use_make, Exec["${definition_name}_make"])
+    }
   }
 
   if $use_make {
